@@ -9,6 +9,15 @@ if (config.nodeEnv === "development") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
+// Health Check for Railway/Deployment
+app.get("/health", (c) => {
+  return c.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    env: config.nodeEnv,
+  });
+});
+
 const authRoutes = require("./routes/authRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -31,6 +40,11 @@ app.use(
     credentials: true,
   }),
 );
+
+// Redirect / to /health for easier verification
+app.get("/", (c) => {
+  return c.redirect("/health");
+});
 
 // Health Check Route
 app.get("/health", (c) => {
