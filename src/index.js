@@ -9,15 +9,6 @@ if (config.nodeEnv === "development") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-// Health Check for Railway/Deployment
-app.get("/health", (c) => {
-  return c.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    env: config.nodeEnv,
-  });
-});
-
 const authRoutes = require("./routes/authRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -62,10 +53,6 @@ app.route("/api/categories", categoryRoutes);
 app.route("/api/products", productRoutes);
 app.route("/api/inventory", inventoryRoutes);
 app.route("/api/audit", auditRoutes);
-
-app.get("/", (c) => {
-  return c.text("Inventory Management System API v1.0.0");
-});
 
 // Global Error Handling
 app.onError((err, c) => {
