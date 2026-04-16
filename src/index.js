@@ -20,17 +20,39 @@ const app = new Hono();
 
 // Global Middlewares
 app.use("*", logger());
+const allowedOrigins = Array.isArray(config.corsOrigin)
+  ? config.corsOrigin
+  : [config.corsOrigin];
+
 app.use(
   "*",
   cors({
-    origin: config.corsOrigin,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: (origin) => {
+      if (!origin) return origin;
+
+      if (allowedOrigins.includes(origin)) {
+        return origin; // ✅ exact match required
+      }
+
+      console.log("❌ Blocked:", origin);
+      return ""; // ❌ block
+    },
     allowHeaders: ["Content-Type", "Authorization"],
-    exposeHeaders: ["Content-Length"],
-    maxAge: 600,
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
-  }),
+  })
 );
+// app.use(
+//   "*",
+//   cors({
+//     origin: config.corsOrigin,
+//     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     allowHeaders: ["Content-Type", "Authorization"],
+//     exposeHeaders: ["Content-Length"],
+//     maxAge: 600,
+//     credentials: true,
+//   }),
+// );
 
 // Redirect / to /health for easier verification
 app.get("/", (c) => {
