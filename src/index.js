@@ -4,10 +4,6 @@ const { cors } = require("hono/cors");
 const { logger } = require("hono/logger");
 const config = require("./config");
 
-console.log("ENV CHECK:", {
-  CORS_ORIGIN: process.env.CORS_ORIGIN,
-  NODE_ENV: process.env.NODE_ENV,
-});
 // Bypass self-signed certificate errors in development
 if (config.nodeEnv === "development") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -29,23 +25,29 @@ const allowedOrigins = Array.isArray(config.corsOrigin)
   : [config.corsOrigin];
 
 app.use(
-  "*",
+  "/api/*",
   cors({
     origin: (origin) => {
-      if (!origin) return origin;
+      console.log("Incoming origin:", origin);
 
-      if (allowedOrigins.includes(origin)) {
-        return origin; // ✅ exact match required
+      // allow your frontend
+      if (
+        origin ===
+        "https://inventory-management-system-frontend-production.up.railway.app"
+      ) {
+        return origin;
       }
 
-      console.log("❌ Blocked:", origin);
-      return ""; // ❌ block
+      return "";
     },
-    allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
+// ✅ VERY IMPORTANT
+app.options("/api/*", cors());
 // app.use(
 //   "*",
 //   cors({
