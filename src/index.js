@@ -4,6 +4,10 @@ const { cors } = require("hono/cors");
 const { logger } = require("hono/logger");
 const config = require("./config");
 
+console.log("ENV CHECK:", {
+  CORS_ORIGIN: process.env.CORS_ORIGIN,
+  NODE_ENV: process.env.NODE_ENV,
+});
 // Bypass self-signed certificate errors in development
 if (config.nodeEnv === "development") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
