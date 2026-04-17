@@ -40,7 +40,7 @@ const corsMiddleware = cors({
 });
 
 
-app.use("/api/*", corsMiddleware);
+app.use("*", corsMiddleware);
 
 // 🔥 CRITICAL FIX
 app.options("/api/*", corsMiddleware);
