@@ -20,34 +20,30 @@ const app = new Hono();
 
 // Global Middlewares
 app.use("*", logger());
-const allowedOrigins = Array.isArray(config.corsOrigin)
-  ? config.corsOrigin
-  : [config.corsOrigin];
 
-app.use(
-  "/api/*",
-  cors({
-    origin: (origin) => {
-      console.log("Incoming origin:", origin);
+const allowedOrigin =
+  "https://inventory-management-system-frontend-production.up.railway.app";
 
-      // allow your frontend
-      if (
-        origin ===
-        "https://inventory-management-system-frontend-production.up.railway.app"
-      ) {
-        return origin;
-      }
+const corsMiddleware = cors({
+  origin: (origin) => {
+    console.log("Incoming origin:", origin);
 
-      return "";
-    },
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+    if (!origin || origin === allowedOrigin) {
+      return origin;
+    }
 
-// ✅ VERY IMPORTANT
-app.options("/api/*", cors());
+    return "";
+  },
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+});
+
+
+app.use("/api/*", corsMiddleware);
+
+// 🔥 CRITICAL FIX
+app.options("/api/*", corsMiddleware);
 // app.use(
 //   "*",
 //   cors({
